@@ -211,6 +211,8 @@ label.chk{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:1
 .tskills{display:grid;gap:8px}
 .tsk{display:grid;grid-template-columns:76px 1fr auto;gap:10px;align-items:center;font-size:14px}
 .tsk .tm2{text-align:right;white-space:nowrap;color:var(--muted);font-variant-numeric:tabular-nums}
+.expill{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:15;display:flex;gap:10px;align-items:center;background:var(--ink);color:var(--bg);padding:8px 8px 8px 16px;border-radius:99px;box-shadow:0 10px 30px -12px rgba(0,0,0,.5)}
+.expill #extime{font-weight:800;font-size:18px;font-variant-numeric:tabular-nums}
 .gsl{font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:4px 10px;border-radius:99px}
 footer{color:var(--muted);font-size:13px;padding-block:0 32px}
 @media (max-width:760px){
@@ -235,6 +237,7 @@ footer{color:var(--muted);font-size:13px;padding-block:0 32px}
       <button class="tab" data-go="writing">Writing</button>
       <button class="tab" data-go="speaking">Speaking</button>
       <button class="tab" data-go="flashcard">Từ vựng</button>
+      <button class="tab" data-go="thi-thu">Thi thử</button>
       <button class="tab admin" data-go="quan-ly" id="adminTab" hidden>Quản lý</button>
     </nav>
   </div>
@@ -554,8 +557,8 @@ function runSteps(steps,mountId,onDone){stopTimer();let i=0,left=0,dur=1;
 const app=document.getElementById('app');
 let view='tong-quan';const cur={core:0,reading:0,listening:0,writing:0,speaking:0};
 let fc={deck:'all',onlyNew:false,i:0,flip:false,list:[]};
-let ed=null,confirmDel=null;
-const VIEWS=['tong-quan','core','reading','listening','writing','speaking','flashcard','quan-ly'];
+let ed=null,confirmDel=null,confirmEx=null,confirmSub=null;
+const VIEWS=['tong-quan','core','reading','listening','writing','speaking','flashcard','thi-thu','quan-ly'];
 
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>{t.hidden=true;},2600);}
 function go(v,part){stopTimer();view=v;ed=null;confirmDel=null;if(part!==undefined)cur[v]=part;try{history.replaceState(null,'','#'+v);}catch(e){}render();window.scrollTo(0,0);}
@@ -567,6 +570,8 @@ function render(){
 }
 function render0(){
   pendingRender=false;
+  queueMicrotask(examDecorate);
+  if(view==='thi-thu'&&loadState==='ready')return renderExam();
   document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-current',b.dataset.go===view?'page':'false'));
   if(view==='quan-ly')return renderAdmin();
   if(['core','reading','listening','writing','speaking','flashcard'].includes(view)&&loadState!=='ready')return renderLoading();
@@ -586,7 +591,7 @@ const curGroup={};
 const GROUPLABEL={core:'Bộ bài',reading:'Bộ bài',listening:'Bộ đề',writing:'Câu lạc bộ',speaking:'Nhóm câu hỏi'};
 function groupsOf(all){const g=[];all.forEach(t=>{if(!g.includes(t.group))g.push(t.group);});return g}
 function groupList(sk){const all=CONTENT[sk];const gs=groupsOf(all);if(!gs.includes(curGroup[sk])){curGroup[sk]=gs[0];cur[sk]=0;}return all.filter(t=>t.group===curGroup[sk])}
-function groupBar(sk,list){const gs=groupsOf(CONTENT[sk]);if(gs.length<2&&list.length<2)return '';
+function groupBar(sk,list){if(EX&&EX_SECS[EX.sec][0]===sk&&curGroup[sk]===EX.g)return '';const gs=groupsOf(CONTENT[sk]);if(gs.length<2&&list.length<2)return '';
   return `<div class="deckbar">${gs.length>1?`<label for="grp-${sk}" style="font-weight:600;font-size:14px">${GROUPLABEL[sk]}</label><select id="grp-${sk}" data-grp="${sk}">${gs.map(g=>`<option value="${esc(g)}" ${g===curGroup[sk]?'selected':''}>${esc(g||'Luyện tập chung')} (${CONTENT[sk].filter(t=>t.group===g).length})</option>`).join('')}</select>`:''}<button class="btn small" data-rand="${sk}">Bài ngẫu nhiên</button></div>`}
 function chipLabel(list,t){const p=t.part.split('·')[0].trim();const dup=list.filter(x=>x.part.split('·')[0].trim()===p).length>1;return p+(dup?' · '+t.title.split(':').pop().trim():'')}
 function chips(list,idx,isDone){return `<nav class="chips" aria-label="Các phần">${list.map((t,i)=>`<button class="chip" data-part="${i}" aria-pressed="${i===idx}">${isDone(t)?'<span class="dot" aria-hidden="true"></span>':''}${esc(chipLabel(list,t))}</button>`).join('')}</nav>`}
@@ -827,10 +832,54 @@ async function moveOrder(sk,i,dir){
 }
 async function delTask(id){if(!DB)return;try{await DB.del(id);toast('Đã xóa bài');}catch(e){toast('Chưa xóa được. Thử lại sau.');}confirmDel=null;render();}
 
+
+/* ================= MOCK EXAM ================= */
+const EX_SECS=[['core','Core (Grammar & Vocabulary)',25],['reading','Reading',35],['listening','Listening',40],['writing','Writing',50],['speaking','Speaking',12]];
+let EX=null;
+function mockList(){const ns=new Set();Object.keys(CONTENT).forEach(sk=>CONTENT[sk].forEach(t=>{const m=t.group.match(/^Đề thi thử (\d+)$/);if(m)ns.add(+m[1]);}));return [...ns].sort((a,b)=>a-b);}
+function mockTasks(n,sk){return (CONTENT[sk]||[]).filter(t=>t.group==='Đề thi thử '+n)}
+function exLeft(){return EX?Math.max(0,Math.round((EX.endAt-Date.now())/1000)):0}
+function exGo(){const sk=EX_SECS[EX.sec][0];curGroup[sk]=EX.g;cur[sk]=0;view=sk;try{history.replaceState(null,'','#'+sk);}catch(e){}render();window.scrollTo(0,0);}
+function exStart(n){EX={n,g:'Đề thi thử '+n,sec:0,res:{},start:Date.now()};exSection();}
+function exSection(){while(EX.sec<EX_SECS.length&&!mockTasks(EX.n,EX_SECS[EX.sec][0]).length)EX.sec++;
+  if(EX.sec>=EX_SECS.length)return exFinish();EX.endAt=Date.now()+EX_SECS[EX.sec][2]*60000;exGo();}
+function exSubmit(auto){stopTimer();const [sk]=EX_SECS[EX.sec];const ts=mockTasks(EX.n,sk);
+  if(sk==='writing'){let w=0,q=0,ok=0;ts.forEach(t=>t.qs.forEach((x,i)=>{q++;const n=wc(S.drafts[t.id+'-'+i]);w+=n;if(n>=x.r[0]&&n<=x.r[1])ok++;}));EX.res[sk]={kind:'w',ok,q,w};}
+  else if(sk==='speaking'){EX.res[sk]={kind:'s',done:ts.filter(t=>S.spoken[t.id]).length,n:ts.length};}
+  else{let a=0,b=0;ts.forEach(t=>{const st=rt(t);if(!st.checked){st.checked=true;}const sc=score(t,st);S.best[t.id]=Math.max(S.best[t.id]||0,sc);a+=sc;b+=total(t);});save();EX.res[sk]={kind:'o',a,b};}
+  if(auto)toast('Hết giờ phần '+EX_SECS[EX.sec][1]+'. Chuyển sang phần tiếp theo.');
+  EX.sec++;exSection();}
+function exFinish(){const r={n:EX.n,date:new Date().toISOString(),res:EX.res,mins:Math.round((Date.now()-EX.start)/60000)};
+  S.mocks=S.mocks||{};S.mocks[EX.n]=r;save();EX=null;view='thi-thu';try{history.replaceState(null,'','#thi-thu');}catch(e){}render();window.scrollTo(0,0);}
+function exResultRows(res){return EX_SECS.filter(([sk])=>res[sk]).map(([sk,name])=>{const x=res[sk];let txt='',pct=null;
+  if(x.kind==='o'){pct=x.b?Math.round(x.a/x.b*100):0;txt=x.a+'/'+x.b+' câu đúng';}
+  else if(x.kind==='w')txt=x.ok+'/'+x.q+' câu đủ số từ ('+x.w+' từ). Cần giáo viên chấm nội dung.';
+  else txt=x.done+'/'+x.n+' phần đã luyện nói hết giờ. Tự nghe lại bản ghi âm.';
+  return `<tr><td class="sk">${esc(name)}</td><td>${txt}</td><td>${pct===null?'—':`<div class="track"><i style="width:${pct}%;${pct>=80?'background:var(--good)':''}"></i></div><div class="dim" style="font-size:13px">${pct}%</div>`}</td></tr>`}).join('')}
+function renderExam(){const ms=mockList();const last=(S.mocks||{});
+  app.innerHTML=`<section><div class="eyebrow">Thi thử</div><h1 class="h1">Đề thi thử bấm giờ</h1>
+   <p class="lead">Làm lần lượt 5 phần như đề thật: Core 25 phút → Reading 35 phút → Listening 40 phút → Writing 50 phút → Speaking 12 phút. Hết giờ, web tự nộp và chuyển phần. Bạn cũng có thể bấm "Nộp phần này" để sang phần sau sớm hơn.</p></section>
+  ${EX?`<div class="note"><b>Bạn đang làm Đề thi thử ${EX.n}</b> – phần ${esc(EX_SECS[EX.sec][1])}, còn ${fmt(exLeft())}. <button class="btn small" data-exback>Quay lại bài thi</button> <button class="btn small danger" data-excancel>Hủy bài thi</button></div>`:''}
+  ${ms.length?ms.map(n=>{const parts=EX_SECS.map(([sk,name,m])=>{const c=mockTasks(n,sk).length;return c?`<span class="phr"><span>${esc(name.split(' ')[0])} · ${m} phút</span></span>`:''}).join(' ');const r=last[n];
+    return `<section class="panel"><div class="row" style="justify-content:space-between"><div class="h2">Đề thi thử ${n}</div>${EX?'':`<button class="btn primary" data-exstart="${n}">${r?'Làm lại':'Bắt đầu'}</button>`}</div>
+     <div class="row" style="margin-top:8px">${parts}</div>
+     ${r?`<div style="margin-top:12px"><div class="dim">Kết quả lần gần nhất (${new Date(r.date).toLocaleDateString('vi-VN')}, ${r.mins} phút):</div><div class="scroll"><table class="fmt" style="min-width:480px"><tbody>${exResultRows(r.res)}</tbody></table></div></div>`:''}</section>`}).join('')
+   :`<div class="empty">Chưa có đề thi thử. Đặt tên nhóm bài là "Đề thi thử 1", "Đề thi thử 2"… trong Quản lý tài liệu hoặc Google Sheets để tạo đề.</div>`}
+  <div class="note"><b>Lưu ý:</b> phần trăm câu đúng chỉ để tự theo dõi, không phải điểm Aptis chính thức (thang 0–50). Ngưỡng B2 chính thức: Listening 34, Reading 38, Writing 40, Speaking 41 trên 50. Nên đặt mục tiêu đúng từ 80% trở lên ở Core, Reading, Listening.</div>`;}
+function examDecorate(){if(!EX)return;const [sk,name]=EX_SECS[EX.sec];if(view!==sk||curGroup[sk]!==EX.g)return;if(document.getElementById('exbar'))return;
+  app.insertAdjacentHTML('afterbegin',`<div class="note" id="exbar"><b>Đề thi thử ${EX.n} · Phần ${EX.sec+1}/5: ${esc(name)}</b> · Làm tất cả các bài trong phần này (bấm các nút Part bên dưới), rồi bấm "Nộp phần này".</div>`);
+  if(!document.getElementById('expill'))document.body.insertAdjacentHTML('beforeend',`<div class="expill" id="expill"><span id="extime">${fmt(exLeft())}</span><button class="btn small primary" data-exsubmit>Nộp phần này →</button></div>`);}
+setInterval(()=>{const p=document.getElementById('expill');if(!EX){if(p)p.remove();return;}const t=document.getElementById('extime');if(t)t.textContent=fmt(exLeft());
+  if(p)p.hidden=!(view===EX_SECS[EX.sec][0]);if(exLeft()<=0)exSubmit(true);},1000);
+
 /* ================= EVENTS ================= */
 document.addEventListener('click',e=>{
   const t=e.target.closest('button,#card');if(!t||t.disabled)return;const d=t.dataset;
   if(d.go)return go(d.go);
+  if(d.exstart){if(!confirmEx||confirmEx!==d.exstart){confirmEx=d.exstart;toast('Bấm "Bắt đầu" lần nữa để bắt đầu tính giờ.');return;}confirmEx=null;return exStart(+d.exstart);}
+  if(d.exsubmit!==undefined){if(confirmSub!==EX.sec){confirmSub=EX.sec;toast('Bấm "Nộp phần này" lần nữa để xác nhận.');return;}confirmSub=null;return exSubmit(false);}
+  if(d.exback!==undefined)return exGo();
+  if(d.excancel!==undefined){EX=null;stopTimer();return render();}
   if(d.part!==undefined){stopTimer();cur[view]=+d.part;render();return window.scrollTo(0,0);}
   if(d.rand){const sk=d.rand;stopTimer();let list=CONTENT[sk].filter(t=>t.group===curGroup[sk]);if(list.length<2)list=CONTENT[sk];
     const curT=CONTENT[sk].filter(t=>t.group===curGroup[sk])[cur[sk]];let pick;let g=0;do{pick=list[Math.floor(Math.random()*list.length)];}while(list.length>1&&pick===curT&&g++<20);
