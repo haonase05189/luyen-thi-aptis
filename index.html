@@ -213,6 +213,8 @@ label.chk{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:1
 .tsk .tm2{text-align:right;white-space:nowrap;color:var(--muted);font-variant-numeric:tabular-nums}
 .expill{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:15;display:flex;gap:10px;align-items:center;background:var(--ink);color:var(--bg);padding:8px 8px 8px 16px;border-radius:99px;box-shadow:0 10px 30px -12px rgba(0,0,0,.5)}
 .expill #extime{font-weight:800;font-size:18px;font-variant-numeric:tabular-nums}
+mark.fm{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px}
+mark.fm::before{content:attr(data-step);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);margin-right:4px;vertical-align:1px}
 .gsl{font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:4px 10px;border-radius:99px}
 footer{color:var(--muted);font-size:13px;padding-block:0 32px}
 @media (max-width:760px){
@@ -674,7 +676,7 @@ function renderWriting(){
     ${q.input?`<label class="vh" for="${esc(id)}">Câu trả lời</label><input type="text" id="${esc(id)}" data-draft="${esc(k)}" autocomplete="off">`:`<label class="vh" for="${esc(id)}">Bài viết</label><textarea id="${esc(id)}" class="${q.long?'long':''}" data-draft="${esc(k)}"></textarea>`}
     <span class="wc" id="c-${esc(k)}" data-r="${q.r[0]}-${q.r[1]}"></span>
     ${frameHtml(q,k)}
-    ${q.s?`<details><summary>Xem bài mẫu</summary><div class="body"><p>${rich(q.s)}</p><p style="color:var(--muted);font-size:13px">${wc(q.s)} từ</p></div></details>`:''}</div>`}).join('');
+    ${q.s?`<details><summary>Xem bài mẫu</summary><div class="body"><p>${markFrame(rich(q.s),frameType(q))}</p>${FRAME_MARKS[frameType(q)]?'<p class="dim" style="font-size:13px">Phần tô màu là các bước của khung bài viết.</p>':''}<p style="color:var(--muted);font-size:13px">${wc(q.s)} từ</p></div></details>`:''}</div>`}).join('');
   app.innerHTML=head('writing')+groupBar('writing',list)+chips(list,cur.writing,x=>x.qs.some((q,i)=>wc(S.drafts[x.id+'-'+i])>0))+
   `<section class="task">${taskHead(p)}
    ${p.notice?`<div class="passage">${p.notice}</div>`:''}
@@ -695,6 +697,12 @@ const FRAMES={
  formal:{name:'Part 4 · Email cho quản lý (120–150 từ)',steps:['Opening: I am writing to share my thoughts about …','Feeling: I am very excited / pleased about …','Suggestion: I would like to suggest …','Reason: I believe … because …','Problem: However, …','Alternative: If … is unavailable, we could …','Additional suggestion: I also suggest + V-ing …','Chia đoạn: Đoạn 1 (25–30 từ) Opening + Feeling · Đoạn 2 (40–50 từ) Suggestion + Reason · Đoạn 3 (35–45 từ) Alternative + Additional suggestion · Kết (10 từ).'],
    phrases:['Dear Sir or Madam,','I am writing to share my thoughts about …','I would like to suggest …','I believe … because …','If … is unavailable, we could …','I look forward to hearing from you.','Yours faithfully,'],frame:'Dear Sir or Madam,\nI am writing to share my thoughts about … . I am very pleased about … .\n\nI would like to suggest … . I believe … because … . However, … .\n\nIf … is unavailable, we could … . I also suggest … .\n\nI look forward to hearing from you.\nYours faithfully,\n…'}
 };
+const FRAME_MARKS={short2:[[/^[^.<]*\./,'Answer'],[/(?<=<\/mark> )[^.<>]*\bbecause\b[^.<]*\./,'Reason'],[/(?:For example|Also|However)[^.<]*\./,'Detail / Example']],
+ chat:[[/^(?:Hi|Hello|Welcome)[^!.,<]*[!.](?: (?:Thanks for|Welcome to)[^.!<]*[.!])?/,'Greeting'],[/(?<=<\/mark> )[^.<>]*?[.!]/,'Answer'],[/(?<=<\/mark> )[^.<>]*\bbecause\b[^.<]*\./,'Reason'],[/(?<=(?:<\/mark>|[.!]) )(?:I also|For example|However|As a result|After that)[^.<]*\./,'Extra / Example']],
+
+ informal:[[/^(Hi|Hello|Dear) [^,<]+,/m,'Greeting'],[/I(?:'|’|&#39;)m (?:really|quite|very|so) (?:excited|disappointed|worried|pleased|happy|sad)[^.<!]*[.!]/,'Feeling'],[/I think [^.<!?]*[.!]/,'Opinion'],[/I(?:'|’|&#39;)m considering [^.<!?]*[.!]/,'Suggestion'],[/(What do you think\?|What about you\?|Do you think it(?:'|’|&#39;)s a good idea\?|Would you like to join me\?)/,'Closing']],
+ formal:[[/I am writing to share my thoughts about[^.<]*\./,'1 Opening'],[/I am (?:very|rather|really)? ?(?:pleased|excited|concerned|disappointed|sorry)[^.<]*\./,'2 Feeling'],[/I would like to suggest[^.<]*\./,'3 Suggestion'],[/I believe[^.<]*\./,'4 Reason'],[/However,[^.<]*\./,'5 Problem'],[/If [^.<]*(?:unavailable|not possible|cannot)[^.<]*\./,'6 Alternative'],[/I also suggest[^.<]*\./,'7 Additional suggestion'],[/I look forward to hearing from you\./,'Closing']]};
+function markFrame(html,type){const L=FRAME_MARKS[type];if(!L)return html;L.forEach(([re,lab])=>{html=html.replace(re,m=>`<mark class="fm" data-step="${lab}">${m}</mark>`);});return html;}
 function frameType(q){const hi=q.r[1];if(hi<=5)return 'short';if(hi<=30)return 'short2';if(hi<=40)return 'chat';if(hi<=60)return 'informal';return 'formal';}
 function frameHtml(q,k){const f=FRAMES[frameType(q)];
   return `<details><summary>Khung bài viết · ${esc(f.name)}</summary><div class="body">
