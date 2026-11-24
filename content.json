@@ -5788,6 +5788,76 @@
    "title": "Viết 2 email",
    "instr": "Email cho bạn khoảng 50 từ (thân mật) và email cho quản lý 120–150 từ (trang trọng). Khoảng 30 phút.",
    "body": "CÂU HỎI: Write an email to your friend, who is also a member of the club. Share your feelings and your suggestion.\nSỐ TỪ: 40-50\nBÀI MẪU: Hi Le,\nI'm really excited about the club's plan to invite an artist for a public talk.\nI think Lan Huong would be perfect because of her charity painting projects.\nI'm considering suggesting her to the club manager.\nWhat do you think?\nBest wishes,\nHoa\n\nCÂU HỎI: Write an email to the organiser of the talk. Share your feelings and give your suggestions for the artist and the topic.\nSỐ TỪ: 120-150\nBÀI MẪU: Dear Sir or Madam,\nI am writing to share my thoughts about the club's plan to invite an artist to give a public talk. I am very pleased that the club wants to attract more attention to our activities.\nI would like to suggest inviting Lan Huong, a painter who sells her work to support poor children. I believe her story would inspire both young and older members. However, she is very busy and may not be available on the planned date.\nIf she is unavailable, we could invite a young local painter to talk about how technology is changing art. I also suggest advertising the talk on social media and in local schools, so that more people will come.\nI look forward to hearing from you.\nYours faithfully,\nThao"
+  },
+  "r3t-1": {
+   "mins": 0,
+   "intro": "James: This is my first time going to a concert, and the experience was quite mixed. During the first two days. The music was rather ordinary, and the event would have been far more enjoyable if there had been just a little sunshine to brighten things up. Luckily, the last day completely changed my impression, as I finally got to see my favorite singers. Meeting them and enjoying the performances made the whole trip memorable and truly special.\n\nLisa: I attend music festivals every year, and over time it has become something of a personal tradition. I really enjoy the energetic atmosphere where people come together to share music and excitement. This particular festival, however, felt quite different from what I am used to. The weather conditions were less than perfect, though it didn't bother me that much, as I have enjoyed festivals in the rain before. The venue was moderately convenient and the performances themselves were rather unremarkable. To be honest, I doubt I will choose to come back in the future.\n\nRobert: I don't like one particular kinds of music being played at festivals, as I much prefer a variety of genres to enjoy and dance to. Luckily, this event truly lived up to what I was hoping for. The songs and melodies were absolutely impressive, leaving a strong impression on me. Although there was some rain, I actually felt it made the atmosphere even more vibrant and fun. One drawback, however, the cost was quite high, which many students, including me, found difficult to afford. Organizers should reconsider the price more carefully.\n\nChristina: My band and I went to the music festival, and we delivered the kind of performance our audience has come to expect from us. The show turned out to be truly memorable, not only because of the energy on stage but also because some of our ex-band members were present. It felt great to reconnect with them and share stories after the performance. The atmosphere overall was very positive, and the crowd seemed to enjoy every moment. The only real challenge was that the venue was located quite far from the main road, which made moving our instruments and equipment rather inconvenient.",
+   "audio": "",
+   "updatedAt": 1795523586094,
+   "order": 130,
+   "skill": "reading",
+   "kind": "select",
+   "group": "Bộ 4 · Ghép ý kiến (đề sưu tầm)",
+   "part": "Part 3 · Opinion matching",
+   "title": "Ghép ý kiến: The music festival",
+   "instr": "Đọc ý kiến của 4 người. Chọn người phù hợp với mỗi câu. Một người có thể được chọn nhiều lần.",
+   "body": "LỰA CHỌN: Christina | James | Lisa | Robert\nWho was not impressed by the event overall? = Lisa\nWho thought the event was expensive? = Robert\nWho is disappointed with the weather? = James\nWho likes meeting old friends? = Christina\nWho enjoyed the final day of the music event? = James\nWho thought the location was not good? = Christina\nWho enjoyed all the music at the music event? = Robert"
+  },
+  "r3t-2": {
+   "mins": 0,
+   "intro": "Jose: I don't usually like sports, but once I tried sea diving at the invitation of my friends. I fell in love with this sport ever since my first attempt. Extreme sports can be very dangerous; therefore, before I decided to take it up as a hobby, I made sure that I fully understood all the guidance from my expert trainers, who have years of experience. This helped me improve myself and feel more confident.\n\nMarisol: Some people like jumping out of aeroplanes or exploring the sea. I'm a pilot, and I have never understood why people would throw themselves into such danger. I once tried an extreme sport and realised I was right from the beginning. My job is already overwhelming and involves enough risky activities. Now, I prefer something more casual, such as baseball or volleyball.\n\nSira: Doing free-diving requires a lot of patience and effort to become proficient. I live far away from the sea, so it is even more difficult for me. I can only do it a few times a year, which is never enough to satisfy my passion. Once I am in the water, I feel at home. I am surrounded by various types of fish and can almost touch them.\n\nBao: As a child, I used to play sports because they were part of our school curriculum. I mean, whose school isn't? However, I have never enjoyed those activities. Some students are naturally gifted, as they have strong physiques and are able to endure long running sessions; however, not everyone is the same. For me, these lessons were rather a waste of time, as I preferred staying indoors and reading books.",
+   "audio": "",
+   "updatedAt": 1795523586094,
+   "order": 131,
+   "skill": "reading",
+   "kind": "select",
+   "group": "Bộ 4 · Ghép ý kiến (đề sưu tầm)",
+   "part": "Part 3 · Opinion matching",
+   "title": "Ghép ý kiến: Extreme sports",
+   "instr": "Đọc ý kiến của 4 người. Chọn người phù hợp với mỗi câu. Một người có thể được chọn nhiều lần.",
+   "body": "LỰA CHỌN: Bao | Jose | Marisol | Sira\nWho enjoy playing extreme sports after first attempt? = Jose\nWho enjoys the nature while doing sports? = Sira\nWho avoid doing any sports? = Bao\nWho think extreme sports are not necessary for them? = Marisol\nWho think training is important before doing extreme sports? = Jose\nWho wishes they are able to do extreme sports more often? = Sira\nWho prefer traditional sports? = Marisol"
+  },
+  "r3t-3": {
+   "mins": 0,
+   "intro": "Sarah: As a child, I played board games with my friends. The rules were simple, easy and straightforward to grasp, which made the games enjoyable and accessible. As I grew older, I came to believe that board games could be a wonderful way for families to bond. However, modern games have become far more complex, with numerous rules and a wide range of characters to choose from. Although I truly enjoyed playing with my two boys and we often laughed together, I found that learning how to play required quite a bit of effort.\n\nWilliam: I preferred to play outdoors with my friends (peers) when I was small. Fortunately, the weather where we lived was usually pleasant, so we often spent hours running around and chasing each other on the field. At times, we would lie down on the grass and make funny faces, enjoying the carefree moments of childhood. Those memories remain incredibly precious to me and shaped my desire to be surrounded by people. Even now, I find it difficult to stay at home alone for long.\n\nSophia: I wasn't able to move much as a child and even now. Instead, I was captivated by books (books are my companions) and often preferred reading in my free time. There was a library I frequently visited, where I could lose myself in different stories for hours. Nowadays, I don't read as much as I used to, but I also don't go out very often because I spend time on my computer. I especially enjoy interactive games, as they allow me to socialize and connect with people online.\n\nJack: I enjoy playing outdoors. On gloomy days, which happened quite often, I would stare sadly out of the window, wishing I could be outside. There wasn't much to do indoors back then-until one day my mother surprised me with a box full of art supplies. Inside were vibrant palettes, paintbrushes of different sizes, and stacks of clean paper. That was the moment I discovered another passion: painting. I could spend hours simply gazing at a blank canvas, imagining what picture I might bring to life next.",
+   "audio": "",
+   "updatedAt": 1795523586094,
+   "order": 132,
+   "skill": "reading",
+   "kind": "select",
+   "group": "Bộ 4 · Ghép ý kiến (đề sưu tầm)",
+   "part": "Part 3 · Opinion matching",
+   "title": "Ghép ý kiến: Childhood activities",
+   "instr": "Đọc ý kiến của 4 người. Chọn người phù hợp với mỗi câu. Một người có thể được chọn nhiều lần.",
+   "body": "LỰA CHỌN: Jack | Sarah | Sophia | William\nWho preferred reading books as a child? = Sophia\nWho enjoyed doing arts as a child? = Jack\nWho enjoyed playing with other children in the past? = William\nWho thought traditional games were much simpler? = Sarah\nWho enjoyed playing games with their children? = Sarah\nWho wished they could spend more time outdoors? = Jack\nWho enjoyed playing modern games? = Sophia"
+  },
+  "r3t-4": {
+   "mins": 0,
+   "intro": "Boyd: I understand may young people like volunteering abroad, but honestly, I feel most people are more interested in traveling. I believe we should use our time more meaningfully. Each town has many people in need. Their situations are difficult, and they don't have the means to improve their quality of life. They are individuals who have contributed a lot to the country. Sharing stories with them helps us understand the differences between generations. We can also broaden our knowledge about local history, traditions, and culture through their experiences.\n\nChirish: My mother was very involved with local charities because she is part of that organization, but I'm not into it. I prefer volunteering abroad because I can develop soft skills – something that will benefit my future career. Also, meeting new people helps me expand my network and create valuable connections I can use later in my professional life.\n\nNoah: I'm busy with work these days and rarely have any free time to do anything, so spending even a few hours volunteering is difficult. I would have to take half a day off work. I see many people in need and they genuinely require some extra financial support. That's something I can help with because I earn a good salary. Making monthly donations is not a problem for me it's how I show my support and contribution.\n\nChinua: I don't have many financial resources but I believe there are many ways we can show kindness through volunteering. I'm retired now, and I currently help build houses for people in need. I work with a volunteering organization that already has clear plans in place. Through this work, I've had the chance to experience different foreign cultures. We're often sent to various countries to carry out these projects, so it's also a great way to travel while doing something meaningful. The job involves manual labor, so we're able to improve our physical health something that some people only begin to notice after a while.",
+   "audio": "",
+   "updatedAt": 1795523586094,
+   "order": 133,
+   "skill": "reading",
+   "kind": "select",
+   "group": "Bộ 4 · Ghép ý kiến (đề sưu tầm)",
+   "part": "Part 3 · Opinion matching",
+   "title": "Ghép ý kiến: Volunteering",
+   "instr": "Đọc ý kiến của 4 người. Chọn người phù hợp với mỗi câu. Một người có thể được chọn nhiều lần.",
+   "body": "LỰA CHỌN: Boyd | Chinua | Chirish | Noah\nWho thinks volunteering enjoys physical benefits? = Chinua\nWho thinks volunteering is a good way to make friends? = Chirish\nWho thinks volunteering is a good reason to travel? = Chinua\nWho thinks volunteering should help local communities? = Boyd\nWho thinks volunteering is good for culture? = Boyd\nWho thinks volunteering can help advance career? = Chirish\nWho thinks volunteering can be helped by giving money? = Noah"
+  },
+  "r3t-5": {
+   "mins": 0,
+   "intro": "Olivia: When I finished school, I didn't really know what I wanted to do. Some people advised me to get a job right away. However, I preferred to gain some practical experience first. That's why I applied for many volunteering roles. Even though I didn't earn any money, I was able to try different kinds of work. Looking back, I'm happy with my decision because of the useful knowledge I gained.\n\nChirish: I went straight to university after I graduated from high school. I had always wanted to become a teacher, so there was no need to look at other careers. Three months ago, I joined an internship at a local school. It was really an eye-opening experience, although the workload was heavier than I thought. Still, I believe it was very worthwhile.\n\nEmma: As a child, I lived near a plumber and sometimes worked with her. She asked me to do easy jobs like checking for pipe leaks or fastening the nails with a screw. So later, it felt natural for me to study at university to become an electrician. Now that I see there are short online electrical courses, I wish I had chosen that instead.\n\nGrace: After school, I wanted some time to figure out what I really wanted. So I started looking for temporary jobs. However, it was difficult to find one because most companies didn't accept people without experience. In the end, a game company contacted me and I agreed to work with them. The job was hybrid, so sometimes I worked in the evenings, but that was fine for me.",
+   "audio": "",
+   "updatedAt": 1795523586094,
+   "order": 134,
+   "skill": "reading",
+   "kind": "select",
+   "group": "Bộ 4 · Ghép ý kiến (đề sưu tầm)",
+   "part": "Part 3 · Opinion matching",
+   "title": "Ghép ý kiến: Choosing a Career",
+   "instr": "Đọc ý kiến của 4 người. Chọn người phù hợp với mỗi câu. Một người có thể được chọn nhiều lần.",
+   "body": "LỰA CHỌN: Chirish | Emma | Grace | Olivia\nWho enjoyed working when training? = Chirish\nWho think they benefited from working for free? = Olivia\nWho thinks their training was too long? = Emma\nWho enjoys working in a flexible work environment? = Grace\nWho did not want to change to other careers? = Chirish\nWho thinks it was hard to get the first job? = Grace\nWho enjoyed doing things with their hands? = Emma"
   }
  }
 }
