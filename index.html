@@ -428,12 +428,13 @@ const DRAFT_KEY='nentang-content-draft';
 let PUBLISHED={},DRAFT=null;
 try{const r=localStorage.getItem(DRAFT_KEY);if(r)DRAFT=JSON.parse(r);}catch(e){}
 function persistDraft(){try{if(DRAFT)localStorage.setItem(DRAFT_KEY,JSON.stringify(DRAFT));else localStorage.removeItem(DRAFT_KEY);}catch(e){toast('Trình duyệt không lưu được bản nháp. Hãy xuất file ngay.');}}
-function applyRaw(){RAW=Object.assign({},DRAFT||PUBLISHED,SHEET_DOCS);rebuild();}
+function mergedDocs(){const out=Object.assign({},PUBLISHED);if(DRAFT)Object.keys(DRAFT).forEach(id=>{const d=DRAFT[id],p=PUBLISHED[id];if(d===null){delete out[id];return;}if(!p||(+d.updatedAt||0)>=(+p.updatedAt||0))out[id]=d;});return out;}
+function applyRaw(){RAW=Object.assign({},mergedDocs(),SHEET_DOCS);rebuild();}
 const store={
   _ensure(){if(!DRAFT)DRAFT=JSON.parse(JSON.stringify(PUBLISHED));},
   async set(id,doc){this._ensure();DRAFT[id]=doc;persistDraft();applyRaw();},
   async update(id,patch){this._ensure();if(DRAFT[id])Object.assign(DRAFT[id],patch);persistDraft();applyRaw();},
-  async del(id){this._ensure();delete DRAFT[id];persistDraft();applyRaw();}
+  async del(id){this._ensure();DRAFT[id]=null;persistDraft();applyRaw();}
 };
 
 /* ================= GOOGLE SHEETS SOURCE ================= */
@@ -590,12 +591,17 @@ const SKILLHEAD={core:['Core','Ngữ pháp & Từ vựng','25 phút cho cả hai
 function head(sk){const h=SKILLHEAD[sk];return `<section><div class="eyebrow">${h[0]}</div><h1 class="h1">${h[1]}</h1><p class="lead">${h[2]}</p></section>`}
 function emptySkill(sk){return head(sk)+`<div class="empty"><div>Chưa có bài luyện nào cho phần ${esc(SKILLNAME[sk])}.</div>${isAdmin?`<button class="btn primary" data-new="${sk}">Thêm bài ${esc(SKILLNAME[sk])}</button>`:''}</div>`}
 const curGroup={};
-const GROUPLABEL={core:'Bộ bài',reading:'Bộ bài',listening:'Bộ đề',writing:'Câu lạc bộ',speaking:'Nhóm câu hỏi'};
+const GROUPLABEL={core:'Bộ bài',reading:'Phần thi',listening:'Bộ đề',writing:'Câu lạc bộ',speaking:'Nhóm câu hỏi'};
 function groupsOf(all){const g=[];all.forEach(t=>{if(!g.includes(t.group))g.push(t.group);});return g}
-function groupList(sk){const all=CONTENT[sk];const gs=groupsOf(all);if(!gs.includes(curGroup[sk])){curGroup[sk]=gs[0];cur[sk]=0;}return all.filter(t=>t.group===curGroup[sk])}
-function groupBar(sk,list){if(EX&&EX_SECS[EX.sec][0]===sk&&curGroup[sk]===EX.g)return '';const gs=groupsOf(CONTENT[sk]);if(gs.length<2&&list.length<2)return '';
-  return `<div class="deckbar">${gs.length>1?`<label for="grp-${sk}" style="font-weight:600;font-size:14px">${GROUPLABEL[sk]}</label><select id="grp-${sk}" data-grp="${sk}">${gs.map(g=>`<option value="${esc(g)}" ${g===curGroup[sk]?'selected':''}>${esc(g||'Luyện tập chung')} (${CONTENT[sk].filter(t=>t.group===g).length})</option>`).join('')}</select>`:''}<button class="btn small" data-rand="${sk}">Bài ngẫu nhiên</button></div>`}
-function chipLabel(list,t){const p=t.part.split('·')[0].trim();const dup=list.filter(x=>x.part.split('·')[0].trim()===p).length>1;return p+(dup?' · '+t.title.split(':').pop().trim():'')}
+const RPARTS=['Part 1 · Matching','Part 2 - Part 3 · Multiple Choice','Part 4 · Comprehension','Part 5 · Long Passage'];
+function rPartKey(t){const m=String(t.part).match(/^Part\s*(\d)/);if(!m)return t.group;const n=+m[1];return n===1?RPARTS[0]:n<=3?RPARTS[1]:n===4?RPARTS[2]:RPARTS[3];}
+function partMode(sk){return sk==='reading'&&!(EX&&EX_SECS[EX.sec][0]===sk&&curGroup[sk]===EX.g);}
+function inGrp(sk,t,g){return partMode(sk)?rPartKey(t)===g:t.group===g}
+function skGroups(sk){const all=CONTENT[sk];if(!partMode(sk))return groupsOf(all);const g=[];all.forEach(t=>{const k=rPartKey(t);if(!g.includes(k))g.push(k);});return RPARTS.filter(x=>g.includes(x)).concat(g.filter(x=>!RPARTS.includes(x)));}
+function groupList(sk){const all=CONTENT[sk];const gs=skGroups(sk);if(!gs.includes(curGroup[sk])){curGroup[sk]=gs[0];cur[sk]=0;}return all.filter(t=>inGrp(sk,t,curGroup[sk]))}
+function groupBar(sk,list){if(EX&&EX_SECS[EX.sec][0]===sk&&curGroup[sk]===EX.g)return '';const gs=skGroups(sk);if(gs.length<2&&list.length<2)return '';
+  return `<div class="deckbar">${gs.length>1?`<label for="grp-${sk}" style="font-weight:600;font-size:14px">${GROUPLABEL[sk]}</label><select id="grp-${sk}" data-grp="${sk}">${gs.map(g=>`<option value="${esc(g)}" ${g===curGroup[sk]?'selected':''}>${esc(g||'Luyện tập chung')} (${CONTENT[sk].filter(t=>inGrp(sk,t,g)).length})</option>`).join('')}</select>`:''}<button class="btn small" data-rand="${sk}">Bài ngẫu nhiên</button></div>`}
+function chipLabel(list,t){if(t.skill==='reading'&&partMode('reading')){const m=t.group.match(/^Đề thi thử (\d+)$/);return t.title.split(':').pop().trim()+(m?' · Đề '+m[1]:'');}if(t.group&&t.group===t.part)return t.title.split(':').pop().trim();const p=t.part.split('·')[0].trim();const dup=list.filter(x=>x.part.split('·')[0].trim()===p).length>1;return p+(dup?' · '+t.title.split(':').pop().trim():'')}
 function chips(list,idx,isDone){return `<nav class="chips" aria-label="Các phần">${list.map((t,i)=>`<button class="chip" data-part="${i}" aria-pressed="${i===idx}">${isDone(t)?'<span class="dot" aria-hidden="true"></span>':''}${esc(chipLabel(list,t))}</button>`).join('')}</nav>`}
 function taskHead(t){return `<div><div class="eyebrow">${esc(t.part)}</div><h2 class="h2">${esc(t.title)}</h2>${t.instr?`<p class="instr">${t.instr}</p>`:''}</div>`}
 
@@ -761,7 +767,7 @@ function renderAdmin(){
   <section class="panel"><div class="h2">Đưa thay đổi lên web</div>
     <ol class="qlist" style="margin-top:8px"><li>Bấm <b>Xuất file content.json</b>.</li><li>Mở repo GitHub của web → <b>Add file → Upload files</b> → kéo file vừa tải vào → <b>Commit changes</b>.</li><li>Đợi khoảng 1 phút, Vercel tự cập nhật web.</li></ol>
     <div class="row" style="margin-top:12px"><button class="btn primary" data-export>Xuất file content.json</button><label class="btn" for="importFile" style="cursor:pointer">Nhập file content.json</label><input type="file" id="importFile" accept=".json,application/json" hidden>${DRAFT?(confirmDel==='__draft'?'<button class="btn danger" data-dropdraft>Xác nhận bỏ nháp</button><button class="btn" data-nodel>Hủy</button>':'<button class="btn" data-askdel="__draft">Bỏ bản nháp</button>'):''}</div>
-    <p style="margin:10px 0 0;font-size:14px;color:var(--muted)">${DRAFT?'Có bản nháp chưa đưa lên web ('+Object.keys(DRAFT).length+' bài). Nhớ xuất file trước khi đổi máy hoặc xóa dữ liệu trình duyệt.':'Chưa có thay đổi nào so với bản đang chạy trên web.'}</p></section>
+    <p style="margin:10px 0 0;font-size:14px;color:var(--muted)">${DRAFT?'Có bản nháp chưa đưa lên web ('+Object.keys(DRAFT).filter(k=>DRAFT[k]).length+' bài). Nhớ xuất file trước khi đổi máy hoặc xóa dữ liệu trình duyệt.':'Chưa có thay đổi nào so với bản đang chạy trên web.'}</p></section>
   ${ready?'':`<div class="note">${esc(loadMsg())}</div>`}
   <div class="row"><button class="btn primary" data-new="core" ${DB?'':'disabled'}>+ Thêm bài mới</button></div>
   ${SKILLS.map(([sk,name])=>{const l=CONTENT[sk];
@@ -889,9 +895,9 @@ document.addEventListener('click',e=>{
   if(d.exback!==undefined)return exGo();
   if(d.excancel!==undefined){EX=null;stopTimer();return render();}
   if(d.part!==undefined){stopTimer();cur[view]=+d.part;render();return window.scrollTo(0,0);}
-  if(d.rand){const sk=d.rand;stopTimer();let list=CONTENT[sk].filter(t=>t.group===curGroup[sk]);if(list.length<2)list=CONTENT[sk];
-    const curT=CONTENT[sk].filter(t=>t.group===curGroup[sk])[cur[sk]];let pick;let g=0;do{pick=list[Math.floor(Math.random()*list.length)];}while(list.length>1&&pick===curT&&g++<20);
-    curGroup[sk]=pick.group;cur[sk]=CONTENT[sk].filter(t=>t.group===pick.group).indexOf(pick);render();return window.scrollTo(0,0);}
+  if(d.rand){const sk=d.rand;stopTimer();let list=CONTENT[sk].filter(t=>inGrp(sk,t,curGroup[sk]));if(list.length<2)list=CONTENT[sk];
+    const curT=CONTENT[sk].filter(t=>inGrp(sk,t,curGroup[sk]))[cur[sk]];let pick;let g=0;do{pick=list[Math.floor(Math.random()*list.length)];}while(list.length>1&&pick===curT&&g++<20);
+    curGroup[sk]=partMode(sk)?rPartKey(pick):pick.group;cur[sk]=CONTENT[sk].filter(t=>inGrp(sk,t,curGroup[sk])).indexOf(pick);render();return window.scrollTo(0,0);}
   if(d.say!==undefined)return speak(d.say);
   if(d.play){const [id,key]=d.play.split('|');const tk=BYID[id];if(!tk)return;const s=rt(tk);markDay();s.plays[key]=(s.plays[key]||0)+1;playMedia(fileFor(tk,key),audioFor(tk,key));return render();}
   if(d.ans){const [id,i,k]=d.ans.split('|');const tk=BYID[id];if(!tk)return;rt(tk).ans[+i]=+k;return render();}
@@ -914,7 +920,7 @@ document.addEventListener('click',e=>{
   if(d.tpl!==undefined){const ta=document.getElementById('f-body');ed.body=(ed.body&&ed.body.trim()?ed.body.replace(/\s+$/,'')+'\n\n':'')+HELP[ed.kind].ex;if(ta)ta.value=ed.body;return updatePreview();}
   if(d.sheetreload!==undefined){SHEET_INFO.state='loading';render();loadSheets().then(()=>{applyRaw();render();toast('Đã tải lại dữ liệu từ Google Sheets');});return;}
   if(d.save!==undefined)return saveEd();
-  if(d.export!==undefined){const data=JSON.stringify({format:'nentang-content-v1',items:DRAFT||PUBLISHED},null,1);const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download='content.json';document.body.appendChild(a);a.click();a.remove();return toast('Đã tải content.json. Giờ tải file này lên GitHub.');}
+  if(d.export!==undefined){const data=JSON.stringify({format:'nentang-content-v1',items:mergedDocs()},null,1);const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download='content.json';document.body.appendChild(a);a.click();a.remove();return toast('Đã tải content.json. Giờ tải file này lên GitHub.');}
   if(d.dropdraft!==undefined){DRAFT=null;persistDraft();confirmDel=null;applyRaw();return render();}
   if(d.ord){const [sk,i,dir]=d.ord.split('|');return moveOrder(sk,+i,+dir);}
   if(d.askdel){confirmDel=d.askdel;return render();}
