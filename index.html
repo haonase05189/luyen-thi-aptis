@@ -586,7 +586,7 @@ function render0(){
 function loadMsg(){return {loading:'Đang tải bài luyện…',slow:'Chưa kết nối được tới dữ liệu bài luyện. Kiểm tra mạng rồi tải lại trang.',nodb:'Không tải được bài luyện ở chế độ xem này. Hãy mở trang trên claude.ai khi đã đăng nhập.',error:'Không tải được file content.json. Kiểm tra file đã có trong repo, rồi tải lại trang.'}[loadState]||''}
 function renderLoading(){app.innerHTML=`<div class="empty">${esc(loadMsg())}</div>`}
 
-const SKILLHEAD={core:['Core','Ngữ pháp & Từ vựng','25 phút cho cả hai phần. Phần Core giúp xác định trình độ chung của bạn.'],reading:['Reading','Đọc hiểu','35 phút, 4 phần, độ khó tăng dần.'],listening:['Listening','Nghe hiểu','Khoảng 40 phút. Bạn được nghe mỗi đoạn tối đa 2 lần.'],writing:['Writing','Viết','50 phút, 4 phần, cùng một bối cảnh câu lạc bộ.'],speaking:['Speaking','Nói','12 phút, trả lời vào micro trên máy tính. Câu hỏi được đọc to.']};
+const SKILLHEAD={core:['Core','Ngữ pháp & Từ vựng','25 phút cho cả hai phần. Phần Core giúp xác định trình độ chung của bạn.'],reading:['Reading','Đọc hiểu','35 phút, 5 phần: Part 1 Matching, Part 2–3 Multiple Choice, Part 4 Comprehension, Part 5 Long Passage.'],listening:['Listening','Nghe hiểu','Khoảng 40 phút. Bạn được nghe mỗi đoạn tối đa 2 lần.'],writing:['Writing','Viết','50 phút, 4 phần, cùng một bối cảnh câu lạc bộ.'],speaking:['Speaking','Nói','12 phút, trả lời vào micro trên máy tính. Câu hỏi được đọc to.']};
 function head(sk){const h=SKILLHEAD[sk];return `<section><div class="eyebrow">${h[0]}</div><h1 class="h1">${h[1]}</h1><p class="lead">${h[2]}</p></section>`}
 function emptySkill(sk){return head(sk)+`<div class="empty"><div>Chưa có bài luyện nào cho phần ${esc(SKILLNAME[sk])}.</div>${isAdmin?`<button class="btn primary" data-new="${sk}">Thêm bài ${esc(SKILLNAME[sk])}</button>`:''}</div>`}
 const curGroup={};
@@ -785,7 +785,7 @@ function renderEditor(){
       <div class="field"><label for="f-kind">Dạng bài</label><select id="f-kind" data-edsel="kind">${KINDS_FOR[sk].map(v=>`<option value="${v}" ${v===k?'selected':''}>${KINDNAME[v]}</option>`).join('')}</select></div>
     </div>
     <div class="fgrid">
-      ${sk!=='vocab'?`<div class="field"><label for="f-part">Tên phần</label><input type="text" id="f-part" data-ed="part" placeholder="Ví dụ: Part 3 · Opinion matching"><span class="hint">Chữ trước dấu · hiện trên nút chọn phần.</span></div>`:''}
+      ${sk!=='vocab'?`<div class="field"><label for="f-part">Tên phần</label><input type="text" id="f-part" data-ed="part" placeholder="Ví dụ: Part 4 · Comprehension"><span class="hint">Chữ trước dấu · hiện trên nút chọn phần.</span></div>`:''}
       ${sk!=='vocab'?`<div class="field"><label for="f-group">Bộ đề / nhóm <span style="font-weight:400;color:var(--muted)">(không bắt buộc)</span></label><input type="text" id="f-group" data-ed="group" placeholder="Ví dụ: Test 1, Music Club"><span class="hint">Các bài cùng nhóm được gom lại, học viên chọn nhóm ở đầu trang.</span></div>`:''}
       <div class="field"><label for="f-title">${sk==='vocab'?'Tên chủ đề':'Tiêu đề'}</label><input type="text" id="f-title" data-ed="title" placeholder="${sk==='vocab'?'Ví dụ: Công việc':'Ví dụ: Ghép ý kiến: làm việc tại nhà'}"></div>
     </div>
